@@ -73,25 +73,6 @@ async fn main() {
             println!("Cleared all points, lines, and animation");
         }
 
-        if is_key_pressed(KeyCode::L) && !is_animating {
-            if positions.len() >= 2 {
-                println!(
-                    "Drawing open polyline through {} points",
-                    positions.len()
-                );
-                for i in 0..positions.len() - 1 {
-                    let p1 = positions[i];
-                    let p2 = positions[i + 1];
-                    draw_line(p1.x, p1.y, p2.x, p2.y, 2.0, GRAY);
-                    println!(
-                        "Drawing line from ({:.1}, {:.1}) to ({:.1}, {:.1})",
-                        p1.x, p1.y, p2.x, p2.y
-                    );
-                }
-            } else {
-                println!("Need at least 2 points to draw connected lines!");
-            }
-        }
 
         if is_key_pressed(KeyCode::Escape) {
             println!("Escape pressed, exiting...");
