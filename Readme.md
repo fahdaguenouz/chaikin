@@ -61,7 +61,7 @@ The program uses several variables to manage its state:
   - If fewer than 2 points, returns the input points unchanged.
   - For each pair of consecutive points \( P_i = (x_1, y_1) \), \( P_{i+1} = (x_2, y_2) \):
     - Computes \( Q = (0.75 \cdot x_1 + 0.25 \cdot x_2, 0.75 \cdot y_1 + 0.25 \cdot y_2) \).
-    - Computes \( R = (0.25 \cdot x_1 + 0.75 \cdot x_2, 0.25 \cdot y_1 + 0.75 \cdot y_2) \).
+    - Computes \( R = (0.25 \cdot x_1 + 0.75 \cdot x_2, 0.25 \cdot y_1 + 0.75 \cdot y_2) \).      
     We use here method `lerp()` in Rust to calculate these points.
     - Adds \( Q \) and \( R \) to `new_points`.
   - If `is_closed` is true and 2+ points exist:
