@@ -1,5 +1,26 @@
+<h1 align="center"> Chaikin </h1>     
 I'll explain how the latest version of the Macroquad project works, focusing on its functionality, structure, and the role of `async` in the `main` function. The project is a graphical application that allows users to draw points on a canvas, apply Chaikin's algorithm to smooth an open polyline (for 3+ points) with a 6-step animation, draw a persistent straight line (for 2 points), and includes controls for clearing and drawing temporary lines. I'll break it down step by step, then explain the `async` aspect in detail.
 
+----
+### Chaikin's Algorithm explanation
+
+Chaikin's algorithm works iteratively, meaning that it can be applied several times to obtain a smoother result. Each iteration follows these steps:
+
+1. We start with a control polygon: We begin with a series of points, connected to each other, which form the baseline.
+
+2. We create two new points on each segment: For each line segment going from point Pi to point Pi+1, we calculate two new points, which we will call Qi and Ri.       
+- Qi is placed at a quarter of the distance between Pi and Pi+1.       
+- Ri is placed at three quarters of the difference between Pi and Pi+1.       
+The formula for calculating these new points is a simple linear interpolation (LERP):     
+```
+🔹Qi=(1−t)×Pi+t×Pi+1, t=0.25       
+🔹Ri=(1−t)×Pi+t×Pi+1, t=0.75   
+```   
+3. A new polygon is formed: The new curve is formed by connecting the new points Qi and Ri in order. Point Ri is connected to point Qi+1
+of the next segment. The control polygon for the next iteration is therefore made up of the sequence of points Q0,R0
+Q1,R1,Q2,R2,...     
+
+4. We repeat the process: We can reapply the algorithm to the new polygon. With each iteration, the number of points on the curve doubles and the curve becomes smoother and smoother.      
 ---
 
 ### Project Overview
@@ -10,10 +31,9 @@ The program uses the **Macroquad** library to create a window where users can:
   - For 3+ points: Start a 6-step animation of Chaikin's algorithm, smoothing an open polyline, restarting after the 6th step.
   - For 0 or 1 point: Print a message, no action.
 - **C Key**: Clear all points, lines, and animation state.
-- **L Key**: Draw a non-persistent gray open polyline (thickness 2.0) when not animating.
 - **Escape Key**: Exit the program.
 
-Points are stored as `(f32, f32)` tuples instead of `Vec2`, and the animation for 3+ points runs for 6 steps (each 1 second), displaying an open polyline without connecting the last point to the first.
+Points are stored as `Vec2`, and the animation for 3+ points runs for 6 steps (each 1 second), displaying an open polyline without connecting the last point to the first.
 
 ---
 
@@ -42,6 +62,7 @@ The program uses several variables to manage its state:
   - For each pair of consecutive points \( P_i = (x_1, y_1) \), \( P_{i+1} = (x_2, y_2) \):
     - Computes \( Q = (0.75 \cdot x_1 + 0.25 \cdot x_2, 0.75 \cdot y_1 + 0.25 \cdot y_2) \).
     - Computes \( R = (0.25 \cdot x_1 + 0.75 \cdot x_2, 0.25 \cdot y_1 + 0.75 \cdot y_2) \).
+    We use here method `lerp()` in Rust to calculate these points.
     - Adds \( Q \) and \( R \) to `new_points`.
   - If `is_closed` is true and 2+ points exist:
     - Processes the segment from the last point to the first, adding \( Q \) and \( R \).
@@ -128,7 +149,6 @@ loop {
 - Point addition logs coordinates.
 - Enter logs line drawing (2 points) or animation start (3+ points).
 - C logs clearing.
-- L logs polyline drawing or error.
 - Animation logs restarts.
 - Escape logs exit.
 
@@ -137,7 +157,6 @@ loop {
 - **Control Points**: Gray unfilled circles (radius 2.0, thickness 1.0).
 - **Two-Point Line**: White line (thickness 2.0), persistent after Enter.
 - **Animation**: White lines (thickness 2.0) for open polyline, updating every second.
-- **L Key Polyline**: Gray lines (thickness 2.0), non-persistent.
 
 ---
 
@@ -177,6 +196,20 @@ The `main` function is declared as `async fn main()` and uses `next_frame().awai
 - `next_frame().await` ensures consistent frame timing, critical for smooth animation (e.g., 1-second steps in Chaikin’s algorithm).
 
 ---
+### Usage 
+
+#### Installation
+To use the program, follow these steps:  
+- Clone the repository:
+```console
+git clone <repository-URL>
+cd <repository-name>
+```
+- Execute program     
+```console
+cargo run
+``` 
+---
 
 ### Example Workflow
 1. **Start**: Window opens, console prints instructions (4:10 PM +01, August 5, 2025).
@@ -184,7 +217,6 @@ The `main` function is declared as `async fn main()` and uses `next_frame().awai
 3. **Press Enter**: White line appears between the two points, persists.
 4. **Click a Third Point**: Third gray circle appears (e.g., (500.0, 600.0)), line remains.
 5. **Press Enter**: Line clears, animation starts, showing an open polyline (3 points) smoothing over 6 steps, cycling every 7 seconds.
-6. **Press L**: If not animating, draws gray lines between points, visible only while pressed.
 7. **Press C**: Clears everything, stops animation.
 8. **Press Escape**: Exits.
 
