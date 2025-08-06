@@ -12,6 +12,7 @@ async fn main() {
     let max_steps = 6;
     let mut step_timer = 0.0;
     let step_duration = 1.0; // Seconds per step
+    let mut show_empty_message = false;
 
     println!("Window created! Press ESC to exit.");
     println!(
@@ -42,11 +43,15 @@ async fn main() {
             let pos = mouse_position().into();
             positions.push(pos);
             println!("Point {} added at position: ({:.1}, {:.1})", positions.len(), pos.x, pos.y);
+            show_empty_message = false;
         }
 
         if is_key_pressed(KeyCode::Enter) {
             match positions.len() {
-                0 => println!("No points to process! Please add points."),
+                0 => {
+                    println!("No points to process! Please add points.");
+                    show_empty_message = true;
+                }
                 1 => println!("Only one point, displaying point only."),
                 2 => {
                     lines.clear();
@@ -60,6 +65,7 @@ async fn main() {
                         p2.x,
                         p2.y
                     );
+                    show_empty_message = false;
                 }
                 _ => {
                     is_animating = true;
@@ -70,7 +76,7 @@ async fn main() {
                     animation_points.push(positions.clone());
                     let mut current = positions.clone();
                     for _ in 0..max_steps {
-                        current = chaikin(&current, false); // Open polyline
+                        current = chaikin(&current); // Open polyline
                         animation_points.push(current.clone());
                     }
                     println!(
@@ -89,6 +95,7 @@ async fn main() {
             current_step = 0;
             step_timer = 0.0;
             println!("Cleared all points, lines, and animation");
+            show_empty_message = false;
         }
 
         if is_key_pressed(KeyCode::Escape) {
@@ -98,6 +105,9 @@ async fn main() {
 
         if is_animating {
             step_timer += get_frame_time();
+            let s: String = format!("steps: {}", 7 - current_step);
+            let str_slice: &str = &s;
+            draw_text(str_slice, 20.0, 50.0, 40.0, WHITE);
             if step_timer >= step_duration {
                 step_timer = 0.0;
                 current_step = (current_step + 1) % (max_steps + 1);
@@ -124,6 +134,9 @@ async fn main() {
 
         for pos in &positions {
             draw_circle_lines(pos.x, pos.y, 2.0, 1.0, GRAY);
+        }
+        if show_empty_message {
+            draw_text("No points to process! Please add points.", 20.0, 110.0, 30.0, RED);
         }
 
         next_frame().await;
