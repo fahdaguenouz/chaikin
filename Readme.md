@@ -198,3 +198,10 @@ The `main` function is declared as `async fn main()` and uses `next_frame().awai
 - **Rendering**: Black background, gray control points, white lines (persistent or animated), gray L-key lines.
 
 If you need further clarification, want to add features (e.g., closed polyline option, adjustable animation speed), or have issues running the code, let me know!
+
+
+### Collaborators
+🔹[Fahd Aguenouz](https://learn.zone01oujda.ma/git/faguenou)   
+🔹[Ndiasse Dieye](https://learn.zone01oujda.ma/git/ndieye)    
+🔹[Zakaria bessadou](https://learn.zone01oujda.ma/git/zbessado)  
+
